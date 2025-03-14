@@ -4,21 +4,25 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/iam43x/interview-help-4u/internal/domain"
-	"github.com/iam43x/interview-help-4u/internal/jwt"
-	"github.com/iam43x/interview-help-4u/internal/util"
+	"github.com/iam43x/interview-help-api/internal/jwt"
+	"github.com/iam43x/interview-help-api/internal/store"
+	"github.com/iam43x/interview-help-api/internal/util"
 )
 
 type LoginAPI struct {
-	Issuer *jwt.Issuer
+	issuer *jwt.Issuer
+	store  *store.Store
 }
 
-func NewLoginAPI(i *jwt.Issuer) *LoginAPI {
-	return &LoginAPI{Issuer: i}
+func NewLoginAPI(i *jwt.Issuer, s *store.Store) *LoginAPI {
+	return &LoginAPI{
+		issuer: i,
+		store: s,
+	}
 }
 
 type LoginRequest struct {
-	Username string `json:"username"`
+	Login    string `json:"login"`
 	Password string `json:"password"`
 }
 
@@ -32,11 +36,16 @@ func (l *LoginAPI) LoginHttpHandler(w http.ResponseWriter, r *http.Request) {
 		util.SendErrorResponse(w, http.StatusForbidden, err.Error())
 		return
 	}
-	if req.Username != "test" && req.Password != "test" {
-		util.SendErrorResponse(w, http.StatusUnauthorized, "Unknown user")
+	u, err := l.store.GetUserById(req.Login)
+	if err != nil {
+		util.SendErrorResponse(w, http.StatusUnauthorized, "Unknown user or pass not valid")
 		return
 	}
-	token, err := l.Issuer.GenerateJWT(&domain.User{Name: req.Username})
+	if err := util.VerifyPassword(u.Pass, req.Password); err != nil {
+		util.SendErrorResponse(w, http.StatusUnauthorized, "Unknown user or pass not valid")
+		return
+	}
+	token, err := l.issuer.GenerateJWT(u)
 	if err != nil {
 		util.SendErrorResponse(w, http.StatusBadRequest, err.Error())
 		return

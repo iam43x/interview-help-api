@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/iam43x/interview-help-4u/internal/util"
+	"github.com/iam43x/interview-help-api/internal/util"
 )
 
 type JWTMiddleware struct {

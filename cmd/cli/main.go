@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/iam43x/interview-help-4u/internal/config"
-	"github.com/iam43x/interview-help-4u/internal/encode"
-	"github.com/iam43x/interview-help-4u/internal/file"
-	"github.com/iam43x/interview-help-4u/internal/gpt"
-	"github.com/iam43x/interview-help-4u/internal/record"
-	"github.com/iam43x/interview-help-4u/internal/util"
+	"github.com/iam43x/interview-help-api/internal/config"
+	"github.com/iam43x/interview-help-api/internal/encode"
+	"github.com/iam43x/interview-help-api/internal/file"
+	"github.com/iam43x/interview-help-api/internal/gpt"
+	"github.com/iam43x/interview-help-api/internal/record"
+	"github.com/iam43x/interview-help-api/internal/util"
 
 	"github.com/gordonklaus/portaudio"
 )
@@ -34,16 +34,16 @@ func main() {
 	recorder := record.NewRecorder(cnf)
 	encoder := encode.NewEncoder(cnf)
 	gptClient := gpt.NewChatGptClient(cnf.ApiKey)
-	
+
 	for {
 		if err := run(ctx, recorder, encoder, gptClient); err != nil {
 			fmt.Println(util.Red(err.Error()))
 		}
 	}
-	
+
 }
 
-func run(ctx context.Context, recorder *record.Recorder, encoder *encode.Encoder, gptClient *gpt.ChatGptClient,) error {
+func run(ctx context.Context, recorder *record.Recorder, encoder *encode.Encoder, gptClient *gpt.ChatGptClient) error {
 	// Запись аудио
 	audioData, err := recorder.RecordAudio()
 	if err != nil {
@@ -74,4 +74,3 @@ func run(ctx context.Context, recorder *record.Recorder, encoder *encode.Encoder
 	fmt.Println(util.Blue(answer))
 	return nil
 }
-

@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/iam43x/interview-help-4u/internal/gpt"
+	"github.com/iam43x/interview-help-api/internal/gpt"
+	"github.com/iam43x/interview-help-api/internal/util"
 )
 
 type QueryAPI struct {
@@ -28,13 +29,13 @@ func NewQueryAPI(g *gpt.ChatGptClient) *QueryAPI {
 func (q *QueryAPI) QueryHttpHandler(w http.ResponseWriter, r *http.Request) {
 	var req RequestQuery
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Ошибка при декодировании запроса", http.StatusBadRequest)
+		util.SendErrorResponse(w, http.StatusBadRequest, "Ошибка при декодировании запроса")
 		return
 	}
 
 	resp, err := q.gptClient.AskGpt3Dot5Turbo16K(r.Context(), req.Text)
 	if err != nil {
-		http.Error(w, "Ошибка при запросе к OpenAI", http.StatusInternalServerError)
+		util.SendErrorResponse(w, http.StatusInternalServerError, "Ошибка при запросе к OpenAI")
 		return
 	}
 

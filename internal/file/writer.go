@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/iam43x/interview-help-4u/internal/util"
+	"github.com/iam43x/interview-help-api/internal/util"
 )
 
 func SaveAudio(r *util.WriteSeeker) error {

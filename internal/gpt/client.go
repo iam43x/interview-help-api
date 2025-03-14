@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/iam43x/interview-help-4u/internal/util"
+	"github.com/iam43x/interview-help-api/internal/util"
 
 	openai "github.com/sashabaranov/go-openai"
 )
@@ -39,7 +39,7 @@ func (c *ChatGptClient) AskGpt3Dot5Turbo16K(ctx context.Context, question string
 		Model: openai.GPT3Dot5Turbo16K,
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role: openai.ChatMessageRoleUser,
+				Role:    openai.ChatMessageRoleUser,
 				Content: question,
 			},
 		},

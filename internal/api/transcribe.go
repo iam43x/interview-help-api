@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/iam43x/interview-help-4u/internal/encode"
-	"github.com/iam43x/interview-help-4u/internal/gpt"
-	"github.com/iam43x/interview-help-4u/internal/util"
+	"github.com/iam43x/interview-help-api/internal/encode"
+	"github.com/iam43x/interview-help-api/internal/gpt"
+	"github.com/iam43x/interview-help-api/internal/util"
 )
 
 type Transcriptor struct {
-	encoder *encode.Encoder
+	encoder   *encode.Encoder
 	gptClient *gpt.ChatGptClient
 }
 
@@ -22,7 +22,7 @@ type ResponseRecognize struct {
 
 func NewTranscriptor(e *encode.Encoder, g *gpt.ChatGptClient) *Transcriptor {
 	return &Transcriptor{
-		encoder: e,
+		encoder:   e,
 		gptClient: g,
 	}
 }
@@ -31,7 +31,7 @@ func (t *Transcriptor) TranscribeHttpHandler(w http.ResponseWriter, r *http.Requ
 	// Получаем файл из формы
 	file, handler, err := r.FormFile("file") // "file" - имя поля в форме
 	if err != nil {
-		http.Error(w, "Ошибка при получении файла", http.StatusBadRequest)
+		util.SendErrorResponse(w, http.StatusBadRequest, "Ошибка при получении файла")
 		return
 	}
 	defer file.Close()
@@ -41,7 +41,7 @@ func (t *Transcriptor) TranscribeHttpHandler(w http.ResponseWriter, r *http.Requ
 
 	fileBytes, err := io.ReadAll(file)
 	if err != nil {
-		http.Error(w, "Ошибка при чтении файла", http.StatusInternalServerError)
+		util.SendErrorResponse(w, http.StatusInternalServerError, "Ошибка при чтении файла")
 		return
 	}
 	var audio *util.WriteSeeker
@@ -53,24 +53,24 @@ func (t *Transcriptor) TranscribeHttpHandler(w http.ResponseWriter, r *http.Requ
 		}
 		audio, err = t.encoder.RawToWav(audioData)
 		if err != nil {
-			http.Error(w, "Ошибка при конвертации файла", http.StatusInternalServerError)
+			util.SendErrorResponse(w, http.StatusInternalServerError, "Ошибка при конвертации файла")
 			return
 		}
 	case "webm":
 		audio = &util.WriteSeeker{Filename: "sample.webm"}
 		audio.Write(fileBytes)
 	default:
-		http.Error(w, "Неверный формат файла", http.StatusBadRequest)
+		util.SendErrorResponse(w, http.StatusBadRequest, "Неверный формат файла")
 	}
 
 	if strings.HasSuffix(handler.Filename, ".wav") {
-		http.Error(w, "Неверный формат файла. Ожидается .wav", http.StatusBadRequest)
+		util.SendErrorResponse(w, http.StatusBadRequest, "Неверный формат файла. Ожидается .wav")
 		return
 	}
 
 	text, err := t.gptClient.TranscribeAudio(r.Context(), audio)
 	if err != nil {
-		http.Error(w, "Ошибка при транскрибации аудио", http.StatusInternalServerError)
+		util.SendErrorResponse(w, http.StatusInternalServerError, "Ошибка при транскрибации аудио")
 		return
 	}
 	encoder := json.NewEncoder(w)

@@ -3,8 +3,8 @@ package encode
 import (
 	"fmt"
 
-	"github.com/iam43x/interview-help-4u/internal/config"
-	"github.com/iam43x/interview-help-4u/internal/util"
+	"github.com/iam43x/interview-help-api/internal/config"
+	"github.com/iam43x/interview-help-api/internal/util"
 
 	"github.com/go-audio/audio"
 	"github.com/go-audio/wav"

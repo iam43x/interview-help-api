@@ -10,6 +10,8 @@ type Config struct {
 
 	PrivateKey string
 	PublicKey  string
+
+	DBPath string
 }
 
 func LoadConfig() *Config {
@@ -21,5 +23,7 @@ func LoadConfig() *Config {
 		// jwt
 		PrivateKey: os.Getenv("JWT_PRIVATE_KEY"),
 		PublicKey:  os.Getenv("JWT_PUBLIC_KEY"),
+		// db
+		DBPath:     os.Getenv("DB_PATH"),
 	}
 }
