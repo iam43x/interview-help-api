@@ -3,6 +3,8 @@ package config
 import "os"
 
 type Config struct {
+	HostnamePort string
+
 	ApiKey     string
 	SampleRate int
 	BitDepth   int
@@ -16,6 +18,9 @@ type Config struct {
 
 func LoadConfig() *Config {
 	return &Config{
+		//server
+		HostnamePort: os.Getenv("HOSTNAME_PORT"),
+
 		ApiKey:     os.Getenv("OPENAI_API_KEY"),
 		SampleRate: 16_000,
 		BitDepth:   16,

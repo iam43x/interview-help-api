@@ -50,7 +50,7 @@ func main() {
 	r.Handle("/login", util.EnableCORS(http.HandlerFunc(l.LoginHttpHandler))).Methods("POST")
 
 	server := &http.Server{
-		Addr:           "localhost:8080",
+		Addr:           cnf.HostnamePort,
 		Handler:        r,
 		ReadTimeout:    5 * time.Second,
 		WriteTimeout:   5 * time.Second,
