@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/iam43x/interview-help-api/internal/jwt"
@@ -39,6 +40,7 @@ func (rg *RegistrationAPI) RegistrationHttpHandler(w http.ResponseWriter, r *htt
 		return
 	}
 	if err := rg.store.ExistsInvite(req.Invite); err != nil {
+		log.Printf("ERROR %s", err.Error())
 		util.SendErrorResponse(w, http.StatusBadRequest, "Invite corrupted")
 		return
 	}
