@@ -34,7 +34,7 @@ func main() {
 	/** API */
 	qr := api.NewQueryAPI(gptClient)
 	tr := api.NewTranscriptor(encoder, gptClient)
-	s, err := store.NewStore("db/user.db")
+	s, err := store.NewStore(cnf.DBPath)
 	if err != nil {
 		log.Fatalf("ошибки инициализации sqlite3 %s", err.Error())
 	}

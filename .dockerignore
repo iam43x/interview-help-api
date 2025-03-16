@@ -1,0 +1,10 @@
+.git/
+.github/
+.vscode/
+nginx/
+db/
+certs/
+docker-compose.yaml
+Dockerfile
+.gitignore
+README.md

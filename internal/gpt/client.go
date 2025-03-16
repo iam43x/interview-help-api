@@ -39,6 +39,10 @@ func (c *ChatGptClient) AskGpt3Dot5Turbo16K(ctx context.Context, question string
 		Model: openai.GPT3Dot5Turbo16K,
 		Messages: []openai.ChatCompletionMessage{
 			{
+				Role: openai.ChatMessageRoleSystem,
+				Content: `Ты помогаешь подготовиться к собеседованию на позицию Senior Java Backend Developer. Отвечай на вопросы развернуто, но не используй больше 10 предложений. Твой ответ должен быть технически точным и полезным для кандидата.`,
+			},
+			{
 				Role:    openai.ChatMessageRoleUser,
 				Content: question,
 			},

@@ -3,6 +3,7 @@ package store
 import (
 	"database/sql"
 	"fmt"
+	"log"
 )
 
 type Store struct {
@@ -14,5 +15,6 @@ func NewStore(filepath string) (*Store, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ошибка при подключении к базе данных: %w", err)
 	}
+	log.Printf("sqlite3 %s started!\n", filepath)
 	return &Store{db: db}, err
 }

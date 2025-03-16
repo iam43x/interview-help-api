@@ -10,8 +10,8 @@ import (
 )
 
 type RegistrationAPI struct {
-	Issuer *jwt.Issuer
-	Store  *store.Store
+	issuer *jwt.Issuer
+	store  *store.Store
 }
 
 type RegistrationRequest struct {
@@ -22,13 +22,13 @@ type RegistrationRequest struct {
 }
 
 type RegistrationResponse struct {
-	Token string
+	Token string `json:"token"`
 }
 
 func NewRegistrationAPI(i *jwt.Issuer, s *store.Store) *RegistrationAPI {
 	return &RegistrationAPI{
-		Issuer: i,
-		Store:  s,
+		issuer: i,
+		store:  s,
 	}
 }
 
@@ -38,8 +38,7 @@ func (rg *RegistrationAPI) RegistrationHttpHandler(w http.ResponseWriter, r *htt
 		util.SendErrorResponse(w, http.StatusForbidden, err.Error())
 		return
 	}
-	inviteParam := r.URL.Query().Get("invite")
-	if inviteParam != "test" {
+	if err := rg.store.ExistsInvite(req.Invite); err != nil {
 		util.SendErrorResponse(w, http.StatusBadRequest, "Invite corrupted")
 		return
 	}
@@ -48,12 +47,12 @@ func (rg *RegistrationAPI) RegistrationHttpHandler(w http.ResponseWriter, r *htt
 		util.SendErrorResponse(w, http.StatusServiceUnavailable, "error while registration")
 		return
 	}
-	u, err := rg.Store.CreateUser(req.Login, req.Name, hp, req.Invite)
+	u, err := rg.store.CreateUser(req.Login, req.Name, hp, req.Invite)
 	if err != nil {
 		util.SendErrorResponse(w, http.StatusServiceUnavailable, "error while registration")
 		return
 	}
-	t, err := rg.Issuer.GenerateJWT(u)
+	t, err := rg.issuer.GenerateJWT(u)
 	if err != nil {
 		util.SendErrorResponse(w, http.StatusServiceUnavailable, "error while generate jwt")
 		return

@@ -36,13 +36,13 @@ func (l *LoginAPI) LoginHttpHandler(w http.ResponseWriter, r *http.Request) {
 		util.SendErrorResponse(w, http.StatusForbidden, err.Error())
 		return
 	}
-	u, err := l.store.GetUserById(req.Login)
+	u, err := l.store.GetUserByLogin(req.Login)
 	if err != nil {
-		util.SendErrorResponse(w, http.StatusUnauthorized, "Unknown user or pass not valid")
+		util.SendErrorResponse(w, http.StatusUnauthorized, err.Error())
 		return
 	}
 	if err := util.VerifyPassword(u.Pass, req.Password); err != nil {
-		util.SendErrorResponse(w, http.StatusUnauthorized, "Unknown user or pass not valid")
+		util.SendErrorResponse(w, http.StatusUnauthorized, "pass not valid")
 		return
 	}
 	token, err := l.issuer.GenerateJWT(u)
