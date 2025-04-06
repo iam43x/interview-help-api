@@ -1,13 +1,11 @@
 package store
 
 import (
-	"errors"
 	"fmt"
+	"log/slog"
 
 	"github.com/iam43x/interview-help-api/internal/domain"
 )
-
-var ErrInviteIsNotActive = errors.New("инвайт не активен!")
 
 func (s *Store) ExistsInvite(value string) error {
 	i := &domain.Invite{}
@@ -17,7 +15,21 @@ func (s *Store) ExistsInvite(value string) error {
 		return fmt.Errorf("ошибка поиска инвайта %w", err)
 	}
 	if !i.IsActive {
-		return ErrInviteIsNotActive
+		return fmt.Errorf("Invites deactivate value=%v", value)
 	}
 	return nil
+}
+
+func (s *Store) DeactivateInvite(value string) {
+	query := "UPDATE invites SET isActive=false WHERE value=?;"
+	res, err := s.db.Exec(query, value)
+	if err != nil {
+        slog.Error("error while deactivate invite [%v]: %w ", value, err)
+    }
+    rowsAffected, err := res.RowsAffected()
+    if err != nil || rowsAffected != 1 {
+        slog.Error("error while deactivate invite [%v]: %w ", value, err)
+    }
+    
+    slog.Debug("Updated invite value=%v.", value)
 }

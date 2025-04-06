@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/iam43x/interview-help-api/internal/jwt"
@@ -40,7 +40,7 @@ func (rg *RegistrationAPI) RegistrationHttpHandler(w http.ResponseWriter, r *htt
 		return
 	}
 	if err := rg.store.ExistsInvite(req.Invite); err != nil {
-		log.Printf("ERROR %s", err.Error())
+		slog.Error(err.Error())
 		util.SendErrorResponse(w, http.StatusBadRequest, "Invite corrupted")
 		return
 	}
@@ -54,6 +54,7 @@ func (rg *RegistrationAPI) RegistrationHttpHandler(w http.ResponseWriter, r *htt
 		util.SendErrorResponse(w, http.StatusServiceUnavailable, "error while registration")
 		return
 	}
+	rg.store.DeactivateInvite(req.Invite)
 	t, err := rg.issuer.GenerateJWT(u)
 	if err != nil {
 		util.SendErrorResponse(w, http.StatusServiceUnavailable, "error while generate jwt")
